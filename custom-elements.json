@@ -1,0 +1,449 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "scripts/lightdom-css.js",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "elements/rh-table/rh-table.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Table",
+          "name": "RhTable",
+          "slots": [
+            {
+              "description": "Place element content here",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "version",
+              "type": {
+                "text": "string"
+              },
+              "static": true,
+              "default": "'{{version}}'"
+            },
+            {
+              "kind": "field",
+              "name": "styles",
+              "type": {
+                "text": "array"
+              },
+              "static": true,
+              "default": "[styles]"
+            },
+            {
+              "kind": "field",
+              "name": "topHeading",
+              "type": {
+                "text": "false | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "sortable",
+              "type": {
+                "text": "null | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "canFullScreen",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_overlay",
+              "type": {
+                "text": "HTMLTableElement | null | undefined"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "hovered",
+              "type": {
+                "text": "hoveredObject"
+              },
+              "privacy": "private",
+              "default": "{\n    hoveredCoordinates: null,\n    styleElement: null,\n    styleSheet: null,\n    checkInterval: null,\n  }"
+            },
+            {
+              "kind": "field",
+              "name": "table",
+              "type": {
+                "text": "HTMLTableElement | null"
+              },
+              "privacy": "public",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "lastSortCol",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "resizeDebounce",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "250"
+            },
+            {
+              "kind": "field",
+              "name": "sortOrder",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "tableSortValues",
+              "type": {
+                "text": "any[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "tableCellValues",
+              "type": {
+                "text": "tableCellContentsObject"
+              },
+              "privacy": "private",
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "_shadowWrapper",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "_openButton",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "_closeButton",
+              "type": {
+                "text": "HTMLElement | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "firstUpdated"
+            },
+            {
+              "kind": "method",
+              "name": "render"
+            },
+            {
+              "kind": "method",
+              "name": "_resizeListener",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_setFullScreen",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_removeFullScreen",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_toggleFullScreen",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "makeFullScreen",
+                  "type": {
+                    "text": "Boolean"
+                  }
+                },
+                {
+                  "description": "Desired state",
+                  "name": "isFullScreen",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ],
+              "description": "Open or close the full screen mode of the table"
+            },
+            {
+              "kind": "method",
+              "name": "_handleEscPress",
+              "privacy": "private",
+              "description": "Handle keyboard inputs",
+              "parameters": [
+                {
+                  "description": "Event object from event listener",
+                  "name": "event",
+                  "type": {
+                    "text": "object"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_sortData",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "object"
+                  },
+                  "description": "Event object from event listener"
+                }
+              ],
+              "description": "Sort the data based on column heading"
+            },
+            {
+              "kind": "method",
+              "name": "_getCSSStyleSheetById",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "stylesheetId",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "HTML id of stylesheet element inDOM"
+                }
+              ],
+              "description": "Get the HTMLStyleElement object by HTML Element's ID",
+              "return": {
+                "type": {
+                  "text": "HTMLStyleElement"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_deleteAllRules",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "stylesheet",
+                  "type": {
+                    "text": "CSSSTyleSheet"
+                  }
+                }
+              ],
+              "description": "Removes all style rules from provided stylesheet"
+            },
+            {
+              "kind": "method",
+              "name": "_rowAndColumnHighlight",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "object"
+                  },
+                  "description": "Event object from event listener"
+                }
+              ],
+              "description": "Function to highlight row, column, and currently hovered cell\nUses the CSSOM to add styles instead of doing a bunch of DOM Updates"
+            },
+            {
+              "kind": "method",
+              "name": "_checkForScroll",
+              "privacy": "private",
+              "description": "Check to see if table scrolls, if so show/enable full screen functionality"
+            },
+            {
+              "kind": "method",
+              "name": "_processLightDom",
+              "privacy": "private",
+              "description": "Copy light DOM into shadow DOM and initialize behaviors"
+            },
+            {
+              "kind": "method",
+              "name": "debounce",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "func",
+                  "type": {
+                    "text": "function"
+                  },
+                  "description": "Function to be debounced"
+                },
+                {
+                  "name": "delay",
+                  "type": {
+                    "text": "number"
+                  },
+                  "description": "How long until it will be run"
+                },
+                {
+                  "name": "immediate",
+                  "default": "false",
+                  "type": {
+                    "text": "boolean"
+                  },
+                  "description": "Whether it should be run at the start instead of the end of the debounce"
+                }
+              ],
+              "description": "Debounce helper function"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "RhTable",
+          "declaration": {
+            "name": "RhTable",
+            "module": "elements/rh-table/rh-table.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "docs/js/global.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "RhdsComponentStatus",
+          "members": [
+            {
+              "kind": "method",
+              "name": "_render"
+            },
+            {
+              "kind": "method",
+              "name": "_fetchData"
+            },
+            {
+              "kind": "field",
+              "name": "spreadSheetUrl",
+              "type": {
+                "text": "string"
+              },
+              "default": "'https://sheets.googleapis.com/v4/spreadsheets/1OfyP6KZcijXMAX7DvN7KYxlUmp8pqH2WQqQ-ndSc4uc/values/Status?key=AIzaSyB2awA3GspCB7QGF751H06A9BZP6f8FhWM'"
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_componentData",
+              "type": {
+                "text": "object"
+              },
+              "default": "{\n      'columns': [],\n      'components': [],\n    }"
+            },
+            {
+              "kind": "field",
+              "name": "_filteredComponentData",
+              "type": {
+                "text": "object"
+              },
+              "default": "{\n      'columns': [],\n      'components': [],\n    }"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "component"
+            }
+          ],
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "tagName": "rhds-component-status",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "rhds-component-status",
+          "declaration": {
+            "name": "RhdsComponentStatus",
+            "module": "docs/js/global.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "elements/rh-table/test/rh-table.e2e.spec.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "elements/rh-table/test/rh-table.spec.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "elements/rh-table/demo/rh-table.js",
+      "declarations": [],
+      "exports": []
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+// @use "@patternfly/pfe-sass" as *;
+
+// @include configure(
+//   $name: 'table',
+//   $variables: (
+//     Border: #d2d2d2,
+//     overlay--Background: rgba(21, 21, 21, 0.5),
+//     // Group styles by region when possible, then access this by using:
+//     // pfe-local(Background, $region: th)
+//     th:
+//       (
+//         Background: transparent,
+//         Color: currentColor,
+//       ),
+//     caption: (
+//       Color: currentColor,
+//     ),
+//   ),
+// );
+
+
+rh-table {
+  display: block;
+  max-width: 100%;
+  margin: 2rem 0;
+}
+
+// Increase specificity and only target tables that are in the component
+rh-table[class][class] table {
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  caption {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    // color: pfe-local(Color, $region: caption);
+    color: currentColor;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  td,
+  th {
+    padding: 0.5em 1rem;
+    border-bottom: 1px solid #d2d2d2;
+    border-left: 0;
+    border-right: 0;
+    // text-align: left;
+    // vertical-align: top;
+    transition: background 0.25s ease-out;
+
+    &.content--lg {
+      min-width: 16em;
+    }
+
+    &.content-md {
+      min-width: 10em;
+    }
+
+    &.halign-left {
+      text-align: left;
+    }
+
+    &.halign-center {
+      text-align: center;
+    }
+
+    &.halign-right {
+      text-align: right;
+    }
+
+    &.valign-top {
+      vertical-align: top;
+    }
+
+    &.valign-middle {
+      vertical-align: middle;
+    }
+
+    &.valign-bottom {
+      vertical-align: bottom;
+    }
+  }
+
+  thead {
+    td,
+    th {
+      padding-top: (24px / 16px * 1em);
+      font-weight: 600;
+      // background: pfe-local(Background, $region: th);
+      background: transparent;
+      border-top: 0;
+    }
+  }
+
+  .sort-button {
+    cursor: pointer;
+
+    > * {
+      pointer-events: none;
+    }
+  }
+}
+
+body.rh-table--is-full-screen {
+  overflow: hidden;
+}
+
+rh-table.full-screen {
+  z-index: 1000;
+}
+
+rh-table[class][class].full-screen {
+  // position: fixed;
+  // top: 40px;
+  // left: 40px;
+  // bottom: 40px;
+  // right: 40px;
+  // margin: 0 auto;
+  // overflow: scroll;
+
+  // Overlay
+  table {
+    margin: 0 auto;
+  }
+}

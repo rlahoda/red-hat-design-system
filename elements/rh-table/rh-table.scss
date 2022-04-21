@@ -1,0 +1,165 @@
+@use "@patternfly/pfe-sass" as *;
+
+@include configure(
+  $name: 'table',
+  $variables: (
+    Border: #d2d2d2,
+    overlay--Background: rgba(21, 21, 21, 0.5),
+    // Group styles by region when possible, then access this by using:
+    // pfe-local(Background, $region: th)
+    th:
+      (
+        Background: transparent,
+        Color: currentColor,
+      ),
+    caption: (
+      Color: currentColor,
+    ),
+  ),
+);
+
+
+:host {
+  display: block;
+}
+
+
+// copied from cp-elements rh-table.scss 
+* {
+  box-sizing: border-box;
+}
+
+:host {
+  // Example local variable, using BEM format
+  // --rh-table--Property: value;
+  display: block;
+  position: relative;
+  // font-family: inherit;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+.full-screen {
+  position: absolute;
+  right: 0;
+}
+
+#wrapper {
+  max-width: 100%;
+  overflow: auto;
+
+  $scrollbar-size: (10 / 16 * 1rem);
+  $scrollbar-track-color: #d6d6d6;
+  $scrollbar-control-color: #8e8e8e;
+  // Firefox & Future standard
+  // scrollbar-width: auto; // Doesn't accept values >:(
+  scrollbar-color: $scrollbar-control-color $scrollbar-track-color;
+
+  // Webkit && Chrome
+  &::-webkit-scrollbar {
+    width: $scrollbar-size;
+    height: $scrollbar-size;
+  }
+  &::-webkit-scrollbar,
+  &::-webkit-scrollbar-track {
+    background-color: $scrollbar-track-color;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: $scrollbar-control-color;
+  }
+
+  &.table-full-screen {
+    position: fixed;
+    top: 40px;
+    left: 40px;
+    right: 40px;
+    bottom: 40px;
+    // transform: translate(-50%, 0);
+    background-color: #fff;
+    margin: 0 auto;
+    overflow: scroll;
+    padding: 40px;
+    z-index: 1;
+
+    .full-screen {
+      right: 40px;
+    }
+  }
+}
+
+.overlay {
+  display: block;
+  background: pfe-local(overlay--Background);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.hidden-text {
+  display: block;
+  width: 1px;
+  height: 1px;
+  position: absolute;
+  overflow: hidden;
+  text-indent: -9999em;
+}
+
+button {
+  border: 0;
+  appearance: none;
+  background-color: #f0efef;
+  cursor: pointer;
+}
+
+button.full-screen {
+  $size-px: 28;
+  $button-size: ($size-px / 16 * 1rem); // Get px to rem
+  width: $button-size;
+  height: $button-size;
+  padding: 6px;
+  color: #9b9b9b; // SVG color
+  background: #f0efef;
+
+  :host(.full-screen) & {
+    display: none;
+  }
+
+  svg {
+    $svg-size: (($size-px - 12) / 16 * 1rem); // Get px to rems
+    width: $svg-size;
+    height: $svg-size;
+  }
+}
+
+button.full-screen--close {
+  $size-px: 32;
+  $button-size: ($size-px / 16 * 1rem); // Get px to rem
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  display: none;
+  width: $button-size;
+  height: $button-size;
+  padding: 8px;
+  background: #f0efef;
+
+  :host(.full-screen) & {
+    display: block;
+  }
+
+  svg {
+    $svg-size: (($size-px - 16) / 16 * 1rem); // Get px to rems
+    width: $svg-size;
+    height: $svg-size;
+  }
+}

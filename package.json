@@ -26,6 +26,7 @@
     "build:elements": "scripts/build.js",
     "build:types": "tsc -b",
     "build:docs": "eleventy --config=.eleventy.cjs",
+    "build:lightdom": "scripts/lightdom-css.js",
     "-----TEST-------": "Test packages",
     "test": "wtr --group default",
     "-----TEST---ALL FRAMEWORKS--": "Test packages - all frameworks",
