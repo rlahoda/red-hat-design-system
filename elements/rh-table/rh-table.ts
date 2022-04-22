@@ -89,7 +89,6 @@ export class RhTable extends LitElement {
     if (!this.id) {
       this.id = `rh-table--${newId}`;
     }
-    document.addEventListener('keydown', this._handleEscPress);
   }
 
   firstUpdated() {
@@ -99,25 +98,19 @@ export class RhTable extends LitElement {
     this._overlay = this.renderRoot.querySelector(".overlay");
 
     if (this.canFullScreen) {
+      // using the debounce function for some reason doesn't fire the checkForScroll function
+      // so for now this is calling it directly
       window.addEventListener('resize', this._checkForScroll);
-      // window.addEventListener('resize', this._resizeListener);
     }
-
     this._processLightDom();
-
     // this.addEventListener(RhTable.events.sorted, this._sortedHandler);
   }
 
   disconnectedCallback() {
-    // this.removeEventListener(RhTable.events.sorted, this._sortedHandler);
     if (this.table) {
       this.table.removeEventListener('mouseover', this._rowAndColumnHighlight);
     }
     window.removeEventListener('resize', this._checkForScroll);
-    // window.removeEventListener('resize', this._resizeListener);
-    // this._overlay.removeEventListener('click', () =>
-    //   this._toggleFullScreen(false)
-    // );
   }
 
   render() {
@@ -194,19 +187,19 @@ export class RhTable extends LitElement {
       }
       if (this._overlay) {
         this._overlay.hidden = false;
-      }
-      window.addEventListener('keydown', this._handleEscPress, true);
+      }      
+      window.addEventListener('keydown', this._handleEscPress);
     } else {
       this.removeAttribute('style');
       this.classList.remove('full-screen');
       document.body.classList.remove('rh-table--is-full-screen');
       if (this._shadowWrapper) {
-      this._shadowWrapper.classList.remove('table-full-screen');
+        this._shadowWrapper.classList.remove('table-full-screen');
       }
       if (this._overlay) {
         this._overlay.hidden = true;
       }
-      // window.removeEventListener('keydown', this._handleEscPress, true);
+      window.removeEventListener('keydown', this._handleEscPress);
     }
   }
 
@@ -214,7 +207,7 @@ export class RhTable extends LitElement {
    * Handle keyboard inputs
    * @param {object} event Event object from event listener
    */
-  @bound private _handleEscPress() {
+  @bound private _handleEscPress(event: any) {
     console.log("event");
     
     // if (event.defaultPrevented) {

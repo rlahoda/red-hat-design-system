@@ -210,16 +210,16 @@
               "kind": "method",
               "name": "_handleEscPress",
               "privacy": "private",
-              "description": "Handle keyboard inputs",
               "parameters": [
                 {
-                  "description": "Event object from event listener",
                   "name": "event",
                   "type": {
                     "text": "object"
-                  }
+                  },
+                  "description": "Event object from event listener"
                 }
-              ]
+              ],
+              "description": "Handle keyboard inputs"
             },
             {
               "kind": "method",
