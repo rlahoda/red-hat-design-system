@@ -3,6 +3,8 @@ import { customElement, property } from 'lit/decorators.js';
 
 import { observed, bound, pfelement } from '@patternfly/pfe-core/decorators.js';
 
+// Typescript doesn't like SCSS import
+// @ts-ignore
 import styles from './rh-table.scss';
 
 // @todo Add design for sorting
@@ -15,6 +17,17 @@ import styles from './rh-table.scss';
 //    - Test to make sure full screen button shows up when table scrolls
 //    - Tests for sorting results
 
+/**
+ * Debounce utility
+ * @see https://decipher.dev/30-seconds-of-typescript/docs/debounce/
+ */
+const debounce:any = (fn: Function, delay:number = 300) => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (this: any, ...args: any[]) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn.apply(this, args), delay);
+  };
+};
 
 interface hoveredObject {
   hoveredCoordinates: any,
@@ -38,22 +51,38 @@ export class RhTable extends LitElement {
 
   static readonly styles = [styles];
 
-  // check to see if the table has a top heading
+  // @todo this is unused?
+  // Check to see if the table has a top heading
   // @observed
-  @property({ type: Boolean, attribute: 'top-heading', reflect: true })
-  topHeading?: false;
+  @property({ type: Boolean, attribute: 'top-heading', reflect: true }) topHeading?: false;
 
-  // check to see if the table is sortable
+  // A comma separated list of columns that are sortable, set on the component tag
+  // this value is 1 indexed, meaning the first column is 1, not 0
+  // @example <rh-table sortable="1,3">
+  @property({
+    type: Array,
+    attribute: 'sortable',
+    reflect: true,
+    converter: {
+      fromAttribute: (value) => {
+        if (value && value.length > 0) {
+          return value.split(',').map(column => parseInt(column.trim()));
+        }
+      },
+      toAttribute: (value:Array<number>) => {
+        if (value && typeof value.toString === 'function') {
+          return value.toString();
+        }
+      }
+    }
+  }) sortableColumns?: [];
+
+  // If this attribute is present the table will have a fullscreen button if it's scrolling horizontally
+  // @example <rh-table fullscreen>
   // @observed
-  @property({ type: String, attribute: 'sortable', reflect: true })
-  sortable?: null;
+  @property({ type: Boolean, attribute: 'fullscreen', reflect: true }) canFullScreen = true;
 
-  // check to see if the full screen button is disabled
-  // @observed
-  @property({ type: Boolean, attribute: 'fullscreen', reflect: true })
-  canFullScreen = true;
-
-  private _overlay: HTMLTableElement | null | undefined = null;
+  private _overlay: HTMLElement | null | undefined = null;
 
   private hovered: hoveredObject = {
     hoveredCoordinates: null,
@@ -69,6 +98,7 @@ export class RhTable extends LitElement {
   private sortOrder: string = "";
   private tableSortValues: any[] = [];
   private tableCellValues: tableCellContentsObject = {};
+  private _debouncedCheckForScroll: Function|undefined;
 
   private _shadowWrapper: HTMLElement | null = null;
   private _openButton: HTMLElement | null = null;
@@ -80,7 +110,7 @@ export class RhTable extends LitElement {
     // Make sure pointers are set
     this.table = this.table ? this.table : this.querySelector('table');
 
-    // Make an unique id for use on table id, style tag id, etc.
+    // Make a random number to make sure generated element's in light DOM HTML id's are unique
     const newId = Math.random()
       .toString(36)
       .substring(2, 9);
@@ -92,15 +122,22 @@ export class RhTable extends LitElement {
   }
 
   firstUpdated() {
+    // @todo Wes to ask Rob what Render Root is
     this._shadowWrapper = this.renderRoot.querySelector("#wrapper");
     this._openButton = this.renderRoot.querySelector("#full-screen--open");
     this._closeButton = this.renderRoot.querySelector("#full-screen--close");
-    this._overlay = this.renderRoot.querySelector(".overlay");
+    this._overlay = this.renderRoot.querySelector(".overlay") as HTMLElement;
 
     if (this.canFullScreen) {
-      // using the debounce function for some reason doesn't fire the checkForScroll function
-      // so for now this is calling it directly
-      window.addEventListener('resize', this._checkForScroll);
+      this._debouncedCheckForScroll = debounce(this._checkForScroll, this.resizeDebounce);
+
+      window.addEventListener('resize',
+        () => {
+          if (this._debouncedCheckForScroll) {
+            this._debouncedCheckForScroll();
+          }
+        }
+      );
     }
     this._processLightDom();
     // this.addEventListener(RhTable.events.sorted, this._sortedHandler);
@@ -110,7 +147,13 @@ export class RhTable extends LitElement {
     if (this.table) {
       this.table.removeEventListener('mouseover', this._rowAndColumnHighlight);
     }
-    window.removeEventListener('resize', this._checkForScroll);
+    window.removeEventListener('resize',
+      () => {
+        if (this._debouncedCheckForScroll) {
+          this._debouncedCheckForScroll();
+        }
+      }
+    );
   }
 
   render() {
@@ -158,12 +201,6 @@ export class RhTable extends LitElement {
     `;
   }
 
-  @bound private _resizeListener() {
-    console.log("resizing");
-    
-    this.debounce(this._checkForScroll, this.resizeDebounce);
-  }
-
   @bound private _setFullScreen() {
     this._toggleFullScreen(true);
   }
@@ -176,21 +213,21 @@ export class RhTable extends LitElement {
    * @param {boolean} isFullScreen Desired state
    */
   @bound private _toggleFullScreen(makeFullScreen: Boolean) {
-    console.log("toggle fullscreen");
-    
     if (makeFullScreen) {
+      // Set a static height so layout doesn't change when fullscreen is pressed
       this.style.height = `${this.offsetHeight}px`;
       this.classList.add('full-screen');
       document.body.classList.add('rh-table--is-full-screen');
+
       if (this._shadowWrapper) {
         this._shadowWrapper.classList.add('table-full-screen');
       }
       if (this._overlay) {
         this._overlay.hidden = false;
-      }      
+      }
       window.addEventListener('keydown', this._handleEscPress);
-    } else {
-      this.removeAttribute('style');
+    }
+    else {
       this.classList.remove('full-screen');
       document.body.classList.remove('rh-table--is-full-screen');
       if (this._shadowWrapper) {
@@ -199,6 +236,7 @@ export class RhTable extends LitElement {
       if (this._overlay) {
         this._overlay.hidden = true;
       }
+      this.removeAttribute('style');
       window.removeEventListener('keydown', this._handleEscPress);
     }
   }
@@ -207,27 +245,26 @@ export class RhTable extends LitElement {
    * Handle keyboard inputs
    * @param {object} event Event object from event listener
    */
-  @bound private _handleEscPress(event: any) {
-    console.log("event");
-    
-    // if (event.defaultPrevented) {
-    //   return; // Do nothing if the event was already processed
-    // }
-    // switch (event.key) {
-    //   case 'Esc': // IE/Edge specific value
-    //   case 'Escape':
-    //     // check to see if table is full screen
-    //     if (document.body.classList.contains('rh-table--is-full-screen')) {
-    //       // if it is, close it
-    //       this._toggleFullScreen(false);
-    //     }
-    //     break;
-    //   default:
-    //     return; // Quit when this doesn't handle the key event.
-    // }
-    // // Cancel the default action to avoid it being handled twice
-    // event.preventDefault();
+  @bound private _handleEscPress(event: KeyboardEvent) {
+    if (event.defaultPrevented) {
+      return; // Do nothing if the event was already processed
+    }
+    switch (event.key) {
+      case 'Esc': // IE/Edge specific value
+      case 'Escape':
+        event.preventDefault();
+        // check to see if table is full screen
+        if (document.body.classList.contains('rh-table--is-full-screen')) {
+          // if it is, close it
+          this._toggleFullScreen(false);
+        }
+        break;
+      default:
+        return; // Quit when this doesn't handle the key event.
+    }
+    // Cancel the default action to avoid it being handled twice
   }
+
   /**
    * Sort the data based on column heading
    * @param {object} event Event object from event listener
@@ -307,7 +344,7 @@ export class RhTable extends LitElement {
       wrapper.appendChild(rowWrapper);
     }
     const tbody = this.querySelector('tbody');
-    if (tbody) {
+    if (tbody && tbody.parentElement) {
       tbody.parentElement.replaceChild(wrapper, tbody);
     }
   }
@@ -412,20 +449,19 @@ export class RhTable extends LitElement {
   /**
    * Check to see if table scrolls, if so show/enable full screen functionality
    */
-
-
   @bound private _checkForScroll() {
+    // console.log('checking for table scroll');
+    // Checks for fullscreen attribute and conditions for a full screen button to work
     if (
       this.canFullScreen &&
       this.table &&
       this._shadowWrapper &&
       this.table.offsetWidth > this._shadowWrapper.offsetWidth
     ) {
-    //  this.hasScroll = false
-    
-    this._openButton?.removeAttribute('hidden');
-  } else {
-    this._openButton?.setAttribute('hidden', "hidden");
+      // Show fullscreen button
+      this._openButton?.removeAttribute('hidden');
+    } else {
+      this._openButton?.setAttribute('hidden', "hidden");
     }
   }
 
@@ -438,8 +474,8 @@ export class RhTable extends LitElement {
       // Begin best time to manipulate the table's markup
       // Modify elements when they're in not in the DOM yet
       //--------------------------------------------------
-
-      const newTable = this.table.cloneNode(true);
+      const sortableColumns:Array<number> = this.sortableColumns ? this.sortableColumns : [];
+      const newTable = this.table.cloneNode(true) as HTMLTableElement;
       this.tableSortValues = [];
 
       // Set data attributes for column and row index
@@ -453,15 +489,15 @@ export class RhTable extends LitElement {
 
         let tableRowValues = [];
         // if the table is sortable, this adds the rows to an object for sorting
-        if (this.sortable) {
+        if (sortableColumns) {
           this.tableCellValues[rowIndex] = Array.from(tableCells);
         }
         for (let colIndex = 0; colIndex < tableCells.length; colIndex++) {
-          const tableCell = tableCells[colIndex];
+          const tableCell = tableCells[colIndex] as HTMLElement;
 
           // Set col & row metadata
-          tableCell.dataset.row = rowIndex + 1;
-          tableCell.dataset.col = colIndex + 1;
+          tableCell.dataset.row = (rowIndex + 1).toString();
+          tableCell.dataset.col = (colIndex + 1).toString();
 
           if (tableCell.innerText.length > 75) {
             tableCell.classList.add('content--lg');
@@ -470,12 +506,10 @@ export class RhTable extends LitElement {
           }
 
           // If the table isn't sortable, don't bother pulling any of the data for sorting
-          if (this.sortable) {
-            const sortableCols = this.sortable.split(',');
-
+          if (sortableColumns) {
             if (
               rowIndex === 0 &&
-              sortableCols.includes((colIndex + 1).toString())
+              sortableColumns.includes(colIndex + 1)
             ) {
               tableCell.addEventListener('click', this._sortData);
               tableCell.classList.add('sort-button');
@@ -491,7 +525,7 @@ export class RhTable extends LitElement {
             this.tableCellValues[rowIndex][colIndex] = tableCell;
           }
         }
-        if (this.sortable) {
+        if (sortableColumns) {
           if (rowIndex !== 0) {
             this.tableSortValues.push(tableRowValues);
           }
@@ -513,41 +547,6 @@ export class RhTable extends LitElement {
       }
       this.classList.add('rh-table--processed');
     }
-  }
-  /**
-   * Debounce helper function
-   * @see https://davidwalsh.name/javascript-debounce-function
-   *
-   * @param {function} func Function to be debounced
-   * @param {number} delay How long until it will be run
-   * @param {boolean} immediate Whether it should be run at the start instead of the end of the debounce
-   */
-   @bound private debounce(func: Function, delay: number, immediate: boolean = false) {
-    console.log("debounced");
-    console.log(func);
-    
-    let timeout: any;
-    return function executedFunction(...args: any) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-  
-      clearTimeout(timeout);
-      timeout = setTimeout(later, delay);
-    };
-    // return function () {
-    //   let context = this,
-    //     args = arguments;
-    //   let later = function () {
-    //     timeout = null;
-    //     if (!immediate) func.apply(context, args);
-    //   };
-    //   let callNow = immediate && !timeout;
-    //   clearTimeout(timeout);
-    //   timeout = setTimeout(later, delay);
-    //   if (callNow) func.apply(context, args);
-    // };
   }
 }
 
