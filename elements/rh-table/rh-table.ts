@@ -103,6 +103,7 @@ export class RhTable extends LitElement {
   private _shadowWrapper: HTMLElement | null = null;
   private _openButton: HTMLElement | null = null;
   private _closeButton: HTMLElement | null = null;
+  private _sortHeadings: NodeList | null = null;
 
   connectedCallback() {
     super.connectedCallback();
@@ -273,13 +274,23 @@ export class RhTable extends LitElement {
     const row = event.target.dataset.row - 1;
     const col = event.target.dataset.col - 1;
     const thisCell = event.target;
-
+  
+    // loop over all headings and remove any sort classes
+    for (let i = 0; i < this._sortHeadings.length; i++) {
+      const element = this._sortHeadings[i];
+      element.classList.remove('sort-az');
+      element.classList.remove('sort-za');
+    }
+    
     // check to see if this is re-sorting a row/col that has been sorted
     // already to swap the direction of the values if it has
+    // also add sort class to heading to add arrow
     if (this.lastSortCol === col && this.sortOrder === 'az') {
       this.sortOrder = 'za';
+      thisCell.classList.add('sort-za');
     } else {
       this.sortOrder = 'az';
+      thisCell.classList.add('sort-az');
     }
     this.lastSortCol = col;
 
@@ -511,6 +522,7 @@ export class RhTable extends LitElement {
               rowIndex === 0 &&
               sortableColumns.includes(colIndex + 1)
             ) {
+              // cell is the header on a sortable column
               tableCell.addEventListener('click', this._sortData);
               tableCell.classList.add('sort-button');
             }
@@ -539,6 +551,7 @@ export class RhTable extends LitElement {
       this.table = newTable;
       if (this.table) {
         this.table.addEventListener('mouseover', this._rowAndColumnHighlight);
+        this._sortHeadings = this.table.querySelectorAll(".sort-button");
       }
       // Setup row/col hover effects
       if (this.canFullScreen) {
