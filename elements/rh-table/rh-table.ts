@@ -159,6 +159,7 @@ export class RhTable extends LitElement {
   render() {
     return html`
       <div id="wrapper" class="rh-docs">
+      <div class="table-full-screen--inner-wrapper">
         <button id="full-screen--open" @click=${this._setFullScreen} class="full-screen">
           <span class="hidden-text">Expand Table</span>
           <svg
@@ -178,25 +179,23 @@ export class RhTable extends LitElement {
           </svg>
         </button>
         <slot></slot>
-      </div>
-      <button id="full-screen--close" @click=${this._removeFullScreen} class="full-screen--close">
-        <span class="hidden-text">Close</span>
-        <svg
-          aria-hidden="true"
-          focusable="false"
-          data-prefix="fas"
-          data-icon="times"
-          class="svg-inline--fa fa-times fa-w-11"
-          role="img"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 352 512"
-        >
-          <path
-            fill="currentColor"
-            d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
-          ></path>
+        <button id="full-screen--close" @click=${this._removeFullScreen} class="full-screen--close">
+          <span class="hidden-text">Close</span>
+          <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28">
+          <path fill="#F0EFEF" d="M0 0h28v28H0z"/>
+          <g clip-path="url(#a)">
+            <path d="M12.25 15h-3.5a.75.75 0 0 0-.531 1.281l1.028.969-3.1 3.103a.502.502 0 0 0 0 .706l.794.794a.502.502 0 0 0 .706 0l3.103-3.103.972 1.031A.749.749 0 0 0 13 19.25v-3.5a.748.748 0 0 0-.75-.75Zm3.5-2h3.5a.751.751 0 0 0 .531-1.281l-1.031-.969 3.103-3.103a.502.502 0 0 0 0-.706l-.794-.794a.502.502 0 0 0-.706 0L17.25 9.25l-.972-1.031A.749.749 0 0 0 15 8.75v3.5c0 .416.334.75.75.75Zm3 4.25 1.031-.972A.749.749 0 0 0 19.25 15h-3.5a.748.748 0 0 0-.75.75v3.5a.751.751 0 0 0 1.281.531l.969-1.028 3.103 3.103a.502.502 0 0 0 .706 0l.794-.794a.502.502 0 0 0 0-.706L18.75 17.25Zm-7.031-9.028-.97 1.028-3.102-3.103a.502.502 0 0 0-.706 0l-.794.794a.502.502 0 0 0 0 .706L9.25 10.75l-1.031.972A.749.749 0 0 0 8.749 13h3.5c.416 0 .75-.334.75-.75v-3.5c0-.666-.809-1-1.28-.528Z" fill="#9B9B9B"/>
+          </g>
+          <defs>
+            <clipPath id="a">
+              <path fill="#fff" transform="translate(6 6)" d="M0 0h16v16H0z"/>
+            </clipPath>
+          </defs>
         </svg>
-      </button>
+        
+        </button>
+      </div>
+      </div>
       <div class="overlay" hidden></div>
     `;
   }
@@ -217,6 +216,7 @@ export class RhTable extends LitElement {
       // Set a static height so layout doesn't change when fullscreen is pressed
       this.style.height = `${this.offsetHeight}px`;
       this.classList.add('full-screen');
+      this.focus();
       document.body.classList.add('rh-table--is-full-screen');
 
       if (this._shadowWrapper) {

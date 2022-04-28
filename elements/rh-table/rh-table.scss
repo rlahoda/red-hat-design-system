@@ -71,22 +71,32 @@
   }
 
   &.table-full-screen {
-    position: fixed;
+    position: absolute;
     top: 40px;
-    left: 40px;
-    right: 40px;
-    bottom: 40px;
-    // transform: translate(-50%, 0);
+    left: 0;
+    right: 0;
     background-color: #fff;
     margin: 0 auto;
     overflow: scroll;
+    width: 100%;
+    max-width: 100%;
     padding: 40px;
     z-index: 1;
-
+    
+    @media (min-width: 1400px) {
+      padding: 40px 160px;
+    }
+    
     .full-screen {
       right: 40px;
     }
   }
+}
+
+.table-full-screen > .table-full-screen--inner-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
 }
 
 .overlay {
@@ -141,16 +151,16 @@ button.full-screen {
 }
 
 button.full-screen--close {
-  $size-px: 32;
+  $size-px: 28;
   $button-size: ($size-px / 16 * 1rem); // Get px to rem
-  position: fixed;
-  top: 1rem;
+  position: absolute;
+  top: 48px;
   right: 1rem;
   z-index: 10;
   display: none;
+  padding: 0;
   width: $button-size;
   height: $button-size;
-  padding: 8px;
   background: #f0efef;
 
   :host(.full-screen) & {
@@ -158,8 +168,7 @@ button.full-screen--close {
   }
 
   svg {
-    $svg-size: (($size-px - 16) / 16 * 1rem); // Get px to rems
-    width: $svg-size;
-    height: $svg-size;
+    width: 100%;
+    height: 100%;
   }
 }
